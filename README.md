@@ -2,6 +2,8 @@
 
 Welcome to the Cloud-Based Lesson Note System! This system provides teachers and school administrators with the flexibility to manage and evaluate lesson notes efficiently.
 
+![Sample](https://github.com/Levi-Chinecherem/lesson-note-system/blob/main/sample%20outputs/p2.png)
+
 ## Table of Contents
 
 - [Features](#features)
@@ -99,19 +101,19 @@ The application will be accessible at [http://127.0.0.1:8000/](http://127.0.0.1:
 
 The teacher's dashboard provides an overview of the teacher's details, subjects, approved and pending lesson plans, and charts displaying statistics.
 
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](https://github.com/Levi-Chinecherem/lesson-note-system/blob/main/sample%20outputs/p2.png)
 
 ### Lesson Plans
 
 Teachers can create, update, delete, and view detailed information about their lesson plans. The system provides charts for visualizing lesson plan statistics.
 
-![Lesson Plans](screenshots/lesson_plans.png)
+![Lesson Plans](https://github.com/Levi-Chinecherem/lesson-note-system/blob/main/sample%20outputs/p3.png)
 
 ### Teacher Profile
 
 Teachers can view and update their profiles, including details such as title, name, email, and address.
 
-![Teacher Profile](screenshots/teacher_profile.png)
+![Teacher Profile](https://github.com/Levi-Chinecherem/lesson-note-system/blob/main/sample%20outputs/p4.png)
 
 ## Contributing
 
