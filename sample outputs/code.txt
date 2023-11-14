@@ -1,0 +1,252 @@
+# teachers/views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Teacher, LessonPlan, Subject, PlanDetails
+from .forms import LessonPlanForm
+from django.contrib.auth.decorators import login_required
+from .forms import TeacherForm
+from django.db.models import Count
+from django.contrib.auth.forms import UserCreationForm
+from django.db import models
+
+@login_required
+def view_profile(request):
+    teacher = Teacher.objects.get(user=request.user)
+    return render(request, 'teachers/view_profile.html', {'teacher': teacher})
+
+@login_required
+def update_profile(request):
+    teacher = Teacher.objects.get(user=request.user)
+    if request.method == 'POST':
+        form = TeacherForm(request.POST, instance=teacher)
+        if form.is_valid():
+            form.save()
+            return redirect('teachers:view_profile')
+    else:
+        form = TeacherForm(instance=teacher)
+    return render(request, 'teachers/update_profile.html', {'form': form})
+
+
+def register(request):
+    if request.method == 'POST':
+        teacher_form = TeacherForm(request.POST)
+        if teacher_form.is_valid():
+            user = request.user
+            try:
+                # Attempt to get the teacher for the user
+                existing_teacher = Teacher.objects.get(user=user)
+                # If the user already has a teacher profile, inform the user
+                message = "You have already registered. You cannot register twice."
+                return render(request, 'message_template.html', {'message': message})
+
+            except Teacher.DoesNotExist:
+                # If the user doesn't have a teacher profile, proceed with registration
+                teacher = teacher_form.save(commit=False)
+                teacher.user = user
+                teacher.save()
+                messages.success(request, 'Registration successful!')
+                return redirect('teachers:view_profile')
+    else:
+        teacher_form = TeacherForm()
+
+    return render(request, 'teachers/register.html', {'teacher_form': teacher_form})
+
+def lesson_plan_detail(request, pk):
+    lesson_plan = get_object_or_404(LessonPlan, pk=pk)
+
+    # You can add more context variables or customize the logic as needed
+    context = {'lesson_plan': lesson_plan}
+
+    return render(request, 'teachers/lesson_plan_detail.html', context)
+    
+@login_required
+def dashboard(request):
+    try:
+        # Try to get the Teacher instance
+        teacher = Teacher.objects.get(user=request.user)
+        subjects = Subject.objects.filter(lessonplan__teacher=teacher)
+    except Teacher.DoesNotExist:
+        # If Teacher instance does not exist, display a message
+        message = "Welcome! Please fill in your profile details to get started."
+        return render(request, 'message_template.html', {'message': message})
+
+    # Fetch approved and pending lesson plans
+    approved_lesson_plans = LessonPlan.objects.filter(teacher=teacher, submission_status='approved')
+    pending_lesson_plans = LessonPlan.objects.filter(teacher=teacher, submission_status='pending')
+
+    # Chart data
+    total_lesson_plans = LessonPlan.objects.filter(teacher=teacher).count()
+    total_pending_plans = pending_lesson_plans.count()
+    total_approved_plans = approved_lesson_plans.count()
+
+    # Number of subjects to lesson plans
+    subjects_with_plans = Subject.objects.filter(lessonplan__teacher=teacher).annotate(num_plans=models.Count('lessonplan'))
+
+
+    # Number of teachers to one subject
+    subjects_with_teachers = Subject.objects.annotate(num_teachers=Count('lessonplan', distinct=True))
+    subject_names_teachers = [subject.title for subject in subjects_with_teachers]
+    num_teachers = [subject.num_teachers for subject in subjects_with_teachers]
+
+    # Subject with highest and lowest number of plans
+    subject_with_highest_plans = subjects_with_plans.order_by('-num_plans').first()
+    subject_with_lowest_plans = subjects_with_plans.order_by('num_plans').first()
+
+    # Subject with highest and lowest number of teachers
+    subject_with_highest_teachers = subjects_with_teachers.order_by('-num_teachers').first()
+    subject_with_lowest_teachers = subjects_with_teachers.order_by('num_teachers').first()
+
+    return render(request, 'teachers/dashboard.html', {
+        'teacher': teacher,
+        'subjects': subjects,
+        'approved_lesson_plans': approved_lesson_plans,
+        'pending_lesson_plans': pending_lesson_plans,
+        'total_lesson_plans': total_lesson_plans,
+        'total_pending_plans': total_pending_plans,
+        'total_approved_plans': total_approved_plans,
+        'subject_names': [subject.title for subject in subjects_with_plans],
+        'num_plans': [subject.num_plans for subject in subjects_with_plans],
+        'subject_with_highest_plans': subject_with_highest_plans,
+        'subject_with_lowest_plans': subject_with_lowest_plans,
+        'subject_names_teachers': subject_names_teachers,
+        'num_teachers': num_teachers,
+        'subject_with_highest_teachers': subject_with_highest_teachers,
+        'subject_with_lowest_teachers': subject_with_lowest_teachers,
+    })
+
+
+@login_required
+def create_lesson_plan(request):
+    if request.method == 'POST':
+        form = LessonPlanForm(request.POST)
+        if form.is_valid():
+            lesson_plan = form.save(commit=False)
+            lesson_plan.teacher = Teacher.objects.get(user=request.user)
+            lesson_plan.save()
+            return redirect('teachers:dashboard')
+    else:
+        form = LessonPlanForm()
+    return render(request, 'teachers/create_lesson_plan.html', {'form': form})
+
+@login_required
+def update_lesson_plan(request, lesson_plan_id):
+    lesson_plan = get_object_or_404(LessonPlan, id=lesson_plan_id, teacher__user=request.user)
+    if request.method == 'POST':
+        form = LessonPlanForm(request.POST, instance=lesson_plan)
+        if form.is_valid():
+            form.save()
+            return redirect('teachers:dashboard')
+    else:
+        form = LessonPlanForm(instance=lesson_plan)
+    return render(request, 'teachers/update_lesson_plan.html', {'form': form, 'lesson_plan': lesson_plan})
+
+@login_required
+def delete_lesson_plan(request, lesson_plan_id):
+    lesson_plan = get_object_or_404(LessonPlan, id=lesson_plan_id, teacher__user=request.user)
+    if request.method == 'POST':
+        lesson_plan.delete()
+        return redirect('teachers:dashboard')
+    return render(request, 'teachers/delete_lesson_plan.html', {'lesson_plan': lesson_plan})
+
+# evaluations/views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from teachers.models import LessonPlan
+from .models import Evaluation, Evaluator
+from .forms import EvaluationForm
+
+# Define a custom test function
+def is_evaluator(user):
+    try:
+        # Check if the user has an associated Evaluator instance
+        return hasattr(user, 'evaluator') or Evaluator.objects.filter(user=user).exists()
+    except Evaluator.DoesNotExist:
+        return False
+
+@login_required
+@user_passes_test(is_evaluator, login_url='home:home')
+def evaluate_lesson_plan(request, lesson_plan_id):
+    lesson_plan = get_object_or_404(LessonPlan, pk=lesson_plan_id)
+    evaluator = request.user.evaluator
+
+    try:
+        evaluation = Evaluation.objects.get(lesson_plan=lesson_plan, evaluator=evaluator)
+    except Evaluation.DoesNotExist:
+        evaluation = None
+
+    if request.method == 'POST':
+        form = EvaluationForm(request.POST, instance=evaluation)
+        if form.is_valid():
+            evaluation = form.save(commit=False)
+            evaluation.lesson_plan = lesson_plan
+            evaluation.evaluator = evaluator
+            evaluation.save()
+
+            # Update the lesson plan submission status based on the form selection
+            submission_status = form.cleaned_data['submission_status']
+            lesson_plan.submission_status = submission_status
+            lesson_plan.save()
+
+            messages.success(request, 'Evaluation submitted successfully.')
+            return redirect('evaluations:evaluation_list')
+    else:
+        form = EvaluationForm(instance=evaluation)
+
+    return render(request, 'evaluations/evaluate_lesson_plan.html', {'form': form, 'lesson_plan': lesson_plan, 'evaluation': evaluation})
+
+@login_required
+@user_passes_test(is_evaluator, login_url='home:home')
+def evaluation_list(request):
+    evaluations = Evaluation.objects.filter(evaluator=request.user.evaluator)
+    return render(request, 'evaluations/evaluation_list.html', {'evaluations': evaluations})
+
+@login_required
+@user_passes_test(is_evaluator, login_url='home:home')
+def evaluation_details(request, evaluation_id):
+    evaluation = get_object_or_404(Evaluation, pk=evaluation_id, evaluator=request.user.evaluator)
+    return render(request, 'evaluations/evaluation_details.html', {'evaluation': evaluation})
+
+@login_required
+@user_passes_test(is_evaluator, login_url='home:home')
+def delete_evaluation(request, lesson_plan_id):
+    lesson_plan = get_object_or_404(LessonPlan, pk=lesson_plan_id)
+    evaluator = request.user.evaluator
+
+    try:
+        evaluation = Evaluation.objects.get(lesson_plan=lesson_plan, evaluator=evaluator)
+        evaluation.delete()
+        messages.success(request, 'Evaluation deleted successfully.')
+    except Evaluation.DoesNotExist:
+        messages.error(request, 'Evaluation does not exist.')
+
+    return redirect('evaluations:evaluation_list')
+
+# account/views.py
+
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
+
+class CustomLoginView(LoginView):
+    template_name = 'account/login.html'
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('account:login')
+
+class CustomSignupView(CreateView):
+    form_class = UserCreationForm
+    template_name = 'account/signup.html'
+    success_url = reverse_lazy('account:login')
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'account/password_change.html'
+    success_url = reverse_lazy('account:password_change_done')
+
+class CustomPasswordChangeDoneView(PasswordChangeDoneView):
+    template_name = 'account/password_change_done.html'
