@@ -33,9 +33,20 @@ class PlanDetails(models.Model):
         return self.title
 
 class LessonPlan(models.Model):
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    SUBMISSION_STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (APPROVED, 'Approved'),
+    ]
+
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     date = models.DateField()
     plan_details = models.ForeignKey(PlanDetails, on_delete=models.CASCADE)
-    submission_status = models.CharField(max_length=20, default='pending')  # Add choices for status if needed
-    # Add other fields as needed
+    submission_status = models.CharField(
+        max_length=20,
+        choices=SUBMISSION_STATUS_CHOICES,
+        default=PENDING,
+    )
+    

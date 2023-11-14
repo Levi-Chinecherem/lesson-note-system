@@ -1,16 +1,22 @@
-<!-- teachers/templates/teachers/register.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Register</h2>
-  
-  <form method="post" action="">
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    {{ teacher_form.as_p }}
-    <button type="submit">Register</button>
-  </form>
-  
-  <a href="{% url 'teachers:view_profile' %}">Cancel</a>
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Teacher Profile Form</h2>
+      </div>
+      <div class="card-body">
+        <form method="post" action="">
+          {% csrf_token %}
+          {{ user_form.as_p }}
+          {{ teacher_form.as_p }}
+          <button type="submit" class="btn btn-success">Register</button>
+        </form>
+      </div>
+      <div class="card-footer text-muted">
+        <a href="{% url 'teachers:view_profile' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </div>
+  </div>
 {% endblock %}

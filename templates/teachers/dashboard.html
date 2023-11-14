@@ -3,100 +3,132 @@
 
 {% block content %}
   <div class="container mt-4">
-    <h2>Welcome, {{ teacher.user.username }}! 🎉</h2>
+    <h2 class="text-center">Welcome, {{ teacher.user.username }}! 🎉</h2>
 
-    <!-- Teacher Details Card -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h3>Your Details:</h3>
+    <div class="row">
+      <!-- Teacher Details Card -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h3>Your Details:</h3>
+          </div>
+          <div class="card-body">
+            <p><strong>Title:</strong> {% if teacher.title %}{{ teacher.title }}{% else %}Not added yet{% endif %}</p>
+            <p><strong>Name:</strong> {{ teacher.name }}</p>
+            <p><strong>Email:</strong> {{ teacher.email }}</p>
+            <p><strong>Address:</strong> {% if teacher.address %}{{ teacher.address }}{% else %}Not added yet{% endif %}</p>
+          </div>
+          <div class="card-footer text-muted">
+            <a href="{% url 'teachers:update_profile' %}" class="btn btn-primary">Update Profile</a>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        <p><strong>Title:</strong> {% if teacher.title %}{{ teacher.title }}{% else %}Not added yet{% endif %}</p>
-        <p><strong>Name:</strong> {{ teacher.name }}</p>
-        <p><strong>Email:</strong> {{ teacher.email }}</p>
-        <p><strong>Address:</strong> {% if teacher.address %}{{ teacher.address }}{% else %}Not added yet{% endif %}</p>
+      
+
+      <!-- Your Subjects Card -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-info text-white">
+            <h3>Your Subjects:</h3>
+          </div>
+          <div class="card-body">
+            {% if subjects %}
+              <ul>
+                {% for subject in subjects %}
+                  <li>{{ subject.title }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No subjects added yet.</p>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Your Subjects Card -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h3>Your Subjects:</h3>
-      </div>
-      <div class="card-body">
-        {% if subjects %}
-          <ul>
-            {% for subject in subjects %}
-              <li>{{ subject.title }}</li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p>No subjects added yet.</p>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Approved and Pending Lesson Plans Cards -->
-    <div class="card-deck mb-4">
+    <div class="row">
       <!-- Approved Lesson Plans Card -->
-      <div class="card">
-        <div class="card-header bg-success text-white">
-          <h4>Approved Lesson Plans</h4>
-        </div>
-        <div class="card-body">
-          {% if approved_lesson_plans %}
-            <ul>
-              {% for lesson_plan in approved_lesson_plans %}
-                <li><a href="{% url 'teachers:lesson_plan_detail' lesson_plan.id %}">{{ lesson_plan.subject.title }} - {{ lesson_plan.date }} - {% if lesson_plan.plan_details.title %}{{ lesson_plan.plan_details.title }}{% else %}Not added yet{% endif %}</a></li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p>No approved lesson plans yet.</p>
-          {% endif %}
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h4>Approved Lesson Plans</h4>
+          </div>
+          <div class="card-body">
+            {% if approved_lesson_plans %}
+              <ul>
+                {% for lesson_plan in approved_lesson_plans %}
+                  <li><a href="{% url 'teachers:lesson_plan_detail' lesson_plan.id %}">{{ lesson_plan.subject.title }} - {{ lesson_plan.date }} - {% if lesson_plan.plan_details.title %}{{ lesson_plan.plan_details.title }}{% else %}Not added yet{% endif %}</a></li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No approved lesson plans yet.</p>
+            {% endif %}
+          </div>
         </div>
       </div>
-    
+
       <!-- Pending Lesson Plans Card -->
-      <div class="card">
-        <div class="card-header bg-warning text-white">
-          <h4>Pending Lesson Plans</h4>
-        </div>
-        <div class="card-body">
-          {% if pending_lesson_plans %}
-            <ul>
-              {% for lesson_plan in pending_lesson_plans %}
-                <li><a href="{% url 'teachers:lesson_plan_detail' lesson_plan.id %}">{{ lesson_plan.subject.title }} - {{ lesson_plan.date }} - {% if lesson_plan.plan_details.title %}{{ lesson_plan.plan_details.title }}{% else %}Not added yet{% endif %}</a></li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p>No pending lesson plans yet.</p>
-          {% endif %}
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-warning text-white">
+            <h4>Pending Lesson Plans</h4>
+          </div>
+          <div class="card-body">
+            {% if pending_lesson_plans %}
+              <ul>
+                {% for lesson_plan in pending_lesson_plans %}
+                  <li><a href="{% url 'teachers:lesson_plan_detail' lesson_plan.id %}">{{ lesson_plan.subject.title }} - {{ lesson_plan.date }} - {% if lesson_plan.plan_details.title %}{{ lesson_plan.plan_details.title }}{% else %}Not added yet{% endif %}</a></li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No pending lesson plans yet.</p>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
-    
 
-    <a href="{% url 'teachers:create_lesson_plan' %}">Create Lesson Plan</a>
+    <div class="row">
+      <!-- Charts Card -->
+      <div class="col-md-12 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3>Charts 📊</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Total Lesson Plans Chart -->
+              <div class="col-md-4 mb-4">
+                <canvas id="totalLessonPlansChart" width="400" height="200"></canvas>
+              </div>
 
-    <!-- Charts Card -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h3>Charts 📊</h3>
-      </div>
-      <div class="card-body">
-        <canvas id="totalLessonPlansChart" width="400" height="200"></canvas>
-        <canvas id="approvedPendingChart" width="400" height="200"></canvas>
-        <canvas id="subjectPlansChart" width="400" height="200"></canvas>
-        <p><strong>Subject with Highest Plans:</strong> {% if subject_with_highest_plans %}{{ subject_with_highest_plans.title }} ({{ subject_with_highest_plans.num_plans }} plans){% else %}None{% endif %}</p>
-        <p><strong>Subject with Lowest Plans:</strong> {% if subject_with_lowest_plans %}{{ subject_with_lowest_plans.title }} ({{ subject_with_lowest_plans.num_plans }} plans){% else %}None{% endif %}</p>
+              <!-- Approved Pending Chart -->
+              <div class="col-md-4 mb-4">
+                <canvas id="approvedPendingChart" width="400" height="200"></canvas>
+              </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            
+              <!-- Subject Plans Chart -->
+              <div class="col-md-4 mb-4">
+                <canvas id="subjectPlansChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+
+            <!-- Subject Statistics -->
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <p><strong>Subject with Highest Plans:</strong> {% if subject_with_highest_plans %}{{ subject_with_highest_plans.title }} ({{ subject_with_highest_plans.num_plans }} plans){% else %}None{% endif %}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Subject with Lowest Plans:</strong> {% if subject_with_lowest_plans %}{{ subject_with_lowest_plans.title }} ({{ subject_with_lowest_plans.num_plans }} plans){% else %}None{% endif %}</p>
+              </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
               var totalLessonPlansCtx = document.getElementById('totalLessonPlansChart').getContext('2d');
               var approvedPendingCtx = document.getElementById('approvedPendingChart').getContext('2d');
               var subjectPlansCtx = document.getElementById('subjectPlansChart').getContext('2d');
-            
+
               var totalLessonPlansChart = new Chart(totalLessonPlansCtx, {
                 type: 'bar',
                 data: {
@@ -108,7 +140,7 @@
                   }]
                 },
               });
-            
+
               var approvedPendingChart = new Chart(approvedPendingCtx, {
                 type: 'pie',
                 data: {
@@ -119,7 +151,7 @@
                   }]
                 },
               });
-            
+
               var subjectPlansChart = new Chart(subjectPlansCtx, {
                 type: 'bar',
                 data: {
@@ -131,27 +163,15 @@
                   }]
                 },
               });
-            
-          var subjectTeachersCtx = document.getElementById('subjectTeachersChart').getContext('2d');
-
-          var subjectTeachersChart = new Chart(subjectTeachersCtx, {
-            type: 'bar',
-            data: {
-              labels: {{ subject_names_teachers|safe }},
-              datasets: [{
-                label: 'Number of Teachers',
-                data: {{ num_teachers|safe }},
-                backgroundColor: '#e74c3c',
-              }]
-            },
-          });
-        </script>
+            </script>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Create Lesson Plan Button -->
-    <div class="text-center">
-      <a href="{% url 'teachers:create_lesson_plan' %}" class="btn btn-primary">Create Lesson Plan</a>
+    <div class="text-center mt-4">
+      <a href="{% url 'teachers:create_lesson_plan' %}" class="btn btn-primary btn-lg">Create Lesson Plan</a>
     </div>
   </div>
 {% endblock %}

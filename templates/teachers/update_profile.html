@@ -1,15 +1,21 @@
-<!-- teachers/templates/teachers/update_profile.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Update Profile</h2>
-  
-  <form method="post" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
-  </form>
-  
-  <a href="{% url 'teachers:view_profile' %}">Back to Profile</a>
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Update Profile</h2>
+      </div>
+      <div class="card-body">
+        <form method="post" action="">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+      </div>
+      <div class="card-footer text-muted">
+        <a href="{% url 'teachers:view_profile' %}" class="btn btn-secondary">Back to Profile</a>
+      </div>
+    </div>
+  </div>
 {% endblock %}

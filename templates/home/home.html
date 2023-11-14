@@ -1,21 +1,25 @@
-<!-- home/templates/home/home.html -->
-
 {% extends 'base.html' %}
 
 {% block title %}Cloud-Based Lesson Note System{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <div class="card-body">
-            <h2 class="card-title mb-4">Welcome to the Cloud-Based Lesson Note System</h2>
-            <p class="card-text">This system provides teachers and school administrators with the flexibility to manage and evaluate lesson notes efficiently.</p>
-            <p class="card-text">Key Features:</p>
-            <ul class="list-group">
-                <li class="list-group-item">Easy lesson plan submission and evaluation.</li>
-                <li class="list-group-item">Digital lesson note templates for various subjects.</li>
-                <li class="list-group-item">Quick correction and feedback process.</li>
-            </ul>
-            <p class="card-text mt-3">Get started by exploring the available features and managing your lesson plans.</p>
+    <div class="container mt-5">
+        <div class="card text-center" style="max-width: 800px; margin: 0 auto;">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Welcome to the Cloud-Based Lesson Note System 🌈</h2>
+                <p class="card-text">This system provides teachers and school administrators with the flexibility to manage and evaluate lesson notes efficiently.</p>
+                <p class="card-text">Key Features:</p>
+                <ul class="list-group">
+                    <li class="list-group-item">📝 Easy lesson plan submission and evaluation.</li>
+                    <li class="list-group-item">📘 Digital lesson note templates for various subjects.</li>
+                    <li class="list-group-item">🚀 Quick correction and feedback process.</li>
+                    <li class="list-group-item">📊 Comprehensive charts for lesson plan analysis.</li>
+                    <li class="list-group-item">📈 Subject-wise lesson plan statistics.</li>
+                    <!-- Add more features as needed -->
+                </ul>
+                <p class="card-text mt-3">Get started by exploring the available features and managing your lesson plans.</p>
+                <a href="{% url 'teachers:dashboard' %}" class="btn btn-primary btn-lg mt-4">Get Started Now</a>
+            </div>
         </div>
     </div>
 {% endblock %}

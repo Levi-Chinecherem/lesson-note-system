@@ -1,16 +1,18 @@
-<!-- teachers/templates/teachers/delete_lesson_plan.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Delete Lesson Plan</h2>
+  <div class="container mt-4">
+    <h2 class="text-danger">Delete Lesson Plan</h2>
   
-  <p>Are you sure you want to delete the lesson plan titled "{{ lesson_plan.subject.title }}"?</p>
+    <div class="alert alert-warning">
+      <p>Are you sure you want to delete the lesson plan titled "{{ lesson_plan.subject.title }}"?</p>
+    </div>
   
-  <form method="post" action="">
-    {% csrf_token %}
-    <button type="submit">Delete</button>
-  </form>
+    <form method="post" action="">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
   
-  <a href="{% url 'teachers:dashboard' %}">Cancel</a>
+    <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">Cancel</a>
+  </div>
 {% endblock %}

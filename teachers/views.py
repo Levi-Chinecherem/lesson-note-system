@@ -6,6 +6,8 @@ from .forms import LessonPlanForm
 from django.contrib.auth.decorators import login_required
 from .forms import TeacherForm
 from django.db.models import Count
+from django.contrib.auth.forms import UserCreationForm
+from django.db import models
 
 @login_required
 def view_profile(request):
@@ -24,28 +26,50 @@ def update_profile(request):
         form = TeacherForm(instance=teacher)
     return render(request, 'teachers/update_profile.html', {'form': form})
 
+
 def register(request):
     if request.method == 'POST':
-        user_form = UserCreationForm(request.POST)
         teacher_form = TeacherForm(request.POST)
-        if user_form.is_valid() and teacher_form.is_valid():
-            user = user_form.save()
-            teacher = teacher_form.save(commit=False)
-            teacher.user = user
-            teacher.save()
-            login(request, user)
-            return redirect('teachers:view_profile')
+        if teacher_form.is_valid():
+            user = request.user
+            try:
+                # Attempt to get the teacher for the user
+                existing_teacher = Teacher.objects.get(user=user)
+                # If the user already has a teacher profile, inform the user
+                message = "You have already registered. You cannot register twice."
+                return render(request, 'message_template.html', {'message': message})
+
+            except Teacher.DoesNotExist:
+                # If the user doesn't have a teacher profile, proceed with registration
+                teacher = teacher_form.save(commit=False)
+                teacher.user = user
+                teacher.save()
+                messages.success(request, 'Registration successful!')
+                return redirect('teachers:view_profile')
     else:
-        user_form = UserCreationForm()
         teacher_form = TeacherForm()
 
-    return render(request, 'teachers/register.html', {'user_form': user_form, 'teacher_form': teacher_form})
+    return render(request, 'teachers/register.html', {'teacher_form': teacher_form})
 
+def lesson_plan_detail(request, pk):
+    lesson_plan = get_object_or_404(LessonPlan, pk=pk)
+
+    # You can add more context variables or customize the logic as needed
+    context = {'lesson_plan': lesson_plan}
+
+    return render(request, 'teachers/lesson_plan_detail.html', context)
+    
 @login_required
 def dashboard(request):
-    teacher = Teacher.objects.get(user=request.user)
-    subjects = Subject.objects.filter(lesson_plan__teacher=teacher)
-    
+    try:
+        # Try to get the Teacher instance
+        teacher = Teacher.objects.get(user=request.user)
+        subjects = Subject.objects.filter(lessonplan__teacher=teacher)
+    except Teacher.DoesNotExist:
+        # If Teacher instance does not exist, display a message
+        message = "Welcome! Please fill in your profile details to get started."
+        return render(request, 'message_template.html', {'message': message})
+
     # Fetch approved and pending lesson plans
     approved_lesson_plans = LessonPlan.objects.filter(teacher=teacher, submission_status='approved')
     pending_lesson_plans = LessonPlan.objects.filter(teacher=teacher, submission_status='pending')
@@ -56,10 +80,11 @@ def dashboard(request):
     total_approved_plans = approved_lesson_plans.count()
 
     # Number of subjects to lesson plans
-    subjects_with_plans = Subject.objects.filter(lesson_plan__teacher=teacher).annotate(num_plans=models.Count('lesson_plan'))
+    subjects_with_plans = Subject.objects.filter(lessonplan__teacher=teacher).annotate(num_plans=models.Count('lessonplan'))
+
 
     # Number of teachers to one subject
-    subjects_with_teachers = Subject.objects.annotate(num_teachers=Count('lesson_plan__teacher', distinct=True))
+    subjects_with_teachers = Subject.objects.annotate(num_teachers=Count('lessonplan', distinct=True))
     subject_names_teachers = [subject.title for subject in subjects_with_teachers]
     num_teachers = [subject.num_teachers for subject in subjects_with_teachers]
 

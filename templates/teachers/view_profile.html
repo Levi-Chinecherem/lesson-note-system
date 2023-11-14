@@ -1,14 +1,20 @@
-<!-- teachers/templates/teachers/view_profile.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Your Profile</h2>
-  
-  <p><strong>Title:</strong> {{ teacher.title }}</p>
-  <p><strong>Name:</strong> {{ teacher.name }}</p>
-  <p><strong>Email:</strong> {{ teacher.email }}</p>
-  <p><strong>Address:</strong> {{ teacher.address }}</p>
-  
-  <a href="{% url 'teachers:update_profile' %}">Update Profile</a>
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-header bg-success text-white">
+        <h2 class="mb-0">Your Profile</h2>
+      </div>
+      <div class="card-body">
+        <p class="card-text"><strong>Title:</strong> {{ teacher.title }}</p>
+        <p class="card-text"><strong>Name:</strong> {{ teacher.name }}</p>
+        <p class="card-text"><strong>Email:</strong> {{ teacher.email }}</p>
+        <p class="card-text"><strong>Address:</strong> {{ teacher.address }}</p>
+      </div>
+      <div class="card-footer text-muted">
+        <a href="{% url 'teachers:update_profile' %}" class="btn btn-primary">Update Profile</a>
+      </div>
+    </div>
+  </div>
 {% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Lesson Plan Details 📚</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text"><strong>Subject:</strong> {{ lesson_plan.subject.title }}</p>
+        <p class="card-text"><strong>Date:</strong> {{ lesson_plan.date }}</p>
+        <p class="card-text"><strong>Plan Details:</strong> {% if lesson_plan.plan_details.title %}{{ lesson_plan.plan_details.title }}{% else %}Not added yet{% endif %}</p>
+        <p class="card-text"><strong>Submission Status:</strong> {{ lesson_plan.submission_status }}</p>
+        <!-- Add other details as needed -->
+
+        <!-- You can add more styling, emojis, or details as needed -->
+      </div>
+      <div class="card-footer text-muted">
+        <a href="{% url 'teachers:update_lesson_plan' lesson_plan.id %}" class="btn btn-primary">Update</a>
+        <a href="{% url 'teachers:delete_lesson_plan' lesson_plan.id %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
