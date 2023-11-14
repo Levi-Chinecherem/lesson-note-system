@@ -1,0 +1,15 @@
+<!-- teachers/templates/teachers/update_lesson_plan.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Update Lesson Plan</h2>
+  
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update</button>
+  </form>
+  
+  <a href="{% url 'teachers:dashboard' %}">Back to Dashboard</a>
+{% endblock %}

@@ -1,0 +1,12 @@
+<!-- evaluations/templates/evaluations/evaluate_lesson_plan.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Evaluate Lesson Plan</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Evaluation</button>
+  </form>
+{% endblock %}

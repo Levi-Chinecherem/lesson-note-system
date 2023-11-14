@@ -1,0 +1,15 @@
+<!-- teachers/templates/teachers/create_lesson_plan.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Create Lesson Plan</h2>
+  
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+  
+  <a href="{% url 'teachers:dashboard' %}">Back to Dashboard</a>
+{% endblock %}

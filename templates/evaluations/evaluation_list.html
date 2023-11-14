@@ -1,0 +1,23 @@
+<!-- evaluations/templates/evaluations/evaluation_list.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Evaluation List</h2>
+  {% if evaluations %}
+    <ul>
+      {% for evaluation in evaluations %}
+        <li>
+          {{ evaluation.lesson_plan.subject.title }} - {{ evaluation.lesson_plan.date }} - 
+          {% if evaluation.lesson_plan.plan_details.title %}{{ evaluation.lesson_plan.plan_details.title }}{% else %}Not added yet{% endif %}
+          - {{ evaluation.comment }} - {{ evaluation.score }} 
+          (<a href="{% url 'evaluations:evaluate_lesson_plan' evaluation.lesson_plan.id %}">Edit</a>,
+          <a href="{% url 'evaluations:delete_evaluation' evaluation.lesson_plan.id %}">Delete</a>,
+          <a href="{% url 'evaluations:evaluation_details' evaluation.id %}">Details</a>)
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No evaluations yet.</p>
+  {% endif %}
+{% endblock %}

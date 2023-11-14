@@ -1,0 +1,14 @@
+<!-- evaluations/templates/evaluations/evaluation_details.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Evaluation Details</h2>
+  <p><strong>Lesson Plan:</strong> {{ evaluation.lesson_plan.subject.title }} - {{ evaluation.lesson_plan.date }} - 
+    {% if evaluation.lesson_plan.plan_details.title %}{{ evaluation.lesson_plan.plan_details.title }}{% else %}Not added yet{% endif %}
+  </p>
+  <p><strong>Comment:</strong> {{ evaluation.comment }}</p>
+  <p><strong>Score:</strong> {{ evaluation.score }}</p>
+  <p><strong>Submission Status:</strong> {{ evaluation.lesson_plan.submission_status }}</p>
+  <!-- Add other details as needed -->
+{% endblock %}
